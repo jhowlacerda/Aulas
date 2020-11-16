@@ -1,0 +1,112 @@
+set serveroutput on;
+DECLARE
+    VCOD_ALUNO TALUNO.COD_ALUNO%TYPE;
+    VNOME TALUNO.NOME%TYPE;
+    CURSOR C1 IS
+        SELECT COD_ALUNO, NOME
+        FROM TALUNO;
+BEGIN
+    OPEN C1;
+    LOOP
+        FETCH C1 INTO VCOD_ALUNO, VNOME;
+        EXIT WHEN C1%ROWCOUNT >= 10 OR C1%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE('CODIGO: '||
+        LPAD(VCOD_ALUNO,4,'0')||' - '||'NOME : '|| VNOME);
+        END LOOP;
+        CLOSE C1;
+END;
+
+
+
+
+
+
+
+set serveroutput on;
+DECLARE
+    CURSOR C1 IS
+        SELECT *
+        FROM TALUNO;
+    REG C1%ROWTYPE;
+BEGIN
+    OPEN C1;
+    LOOP
+        FETCH C1 INTO REG;
+        EXIT WHEN C1%ROWCOUNT >= 10 OR C1%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE('CODIGO: '||
+        LPAD(REG.COD_ALUNO,5,'0')||' - '||'NOME : '|| REG.NOME);
+        END LOOP;
+        CLOSE C1;
+END;
+
+
+
+--UMA DAS MELHORES OP합ES ABAIXO
+set serveroutput on;
+DECLARE
+    CURSOR C1 IS
+        SELECT *FROM TALUNO;
+    REG TALUNO%ROWTYPE;
+BEGIN
+    FOR REG IN C1
+    LOOP
+        DBMS_OUTPUT.PUT_LINE('CODIGO: '||
+        LPAD(REG.COD_ALUNO,5,'0')||' - '||'NOME : '|| REG.NOME);
+        END LOOP;
+END;
+
+
+
+
+
+
+
+set serveroutput on;
+DECLARE
+    REG TALUNO%ROWTYPE;
+BEGIN
+    FOR REG IN (select * from taluno)
+    LOOP
+        DBMS_OUTPUT.PUT_LINE('CODIGO: '||
+        LPAD(REG.COD_ALUNO,5,'0')||' - '||'NOME : '|| REG.NOME);
+        END LOOP;
+END;
+
+
+
+--UMA DAS MELHORES OP합ES ABAIXO
+set serveroutput on;
+DECLARE
+    CURSOR C1 (PCOD_ALUNO NUMBER) IS
+    SELECT *
+    FROM TALUNO
+    WHERE COD_ALUNO = PCOD_ALUNO
+    FOR UPDATE OF NOME NOWAIT;--BLOQUEA A COLUNA NOME PARA ALTERA플O
+    REG C1%ROWTYPE;
+BEGIN
+    OPEN C1(&codigo);
+    FETCH C1 INTO REG;
+    DBMS_OUTPUT.PUT_LINE('CODIGO: '||
+        LPAD(REG.COD_ALUNO,5,'0')||' - '||'NOME : '|| REG.NOME);
+    CLOSE C1;
+END;
+
+
+set serveroutput on;
+DECLARE
+    CURSOR C1 IS
+    SELECT NOME FROM TALUNO
+    FOR UPDATE ;--BLOQUEA A COLUNA NOME PARA ALTERA플O
+    REG_ALUNO C1%ROWTYPE;
+BEGIN
+    FOR REG_ALUNO IN C1
+    LOOP
+    UPDATE TALUNO
+    SET NOME = INITCAP(REG_ALUNO.NOME)
+    WHERE CURRENT OF C1;
+    DBMS_OUTPUT.PUT_LINE('NOME: '||INITCAP (REG_ALUNO.NOME));
+    END LOOP;
+    COMMIT;
+END;
+
+
